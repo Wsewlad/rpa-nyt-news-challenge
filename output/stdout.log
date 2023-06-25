@@ -1,0 +1,35 @@
+Start: [Enter Search Query]
+End: [Enter Search Query] Execution time - 0m:9s:126ms
+Start: [Set Filters]
+Unknown filters:  ['Something']
+End: [Set Filters] Execution time - 0m:1s:497ms
+No section filters provided
+Start: [Set Date Range]
+End: [Set Date Range] Execution time - 0m:3s:937ms
+Start: [Sort By Newest]
+End: [Sort By Newest] Execution time - 0m:0s:318ms
+Start: [Expand And Get All Articles]
+No more Show Button - Element with locator 'css:[data-testid="search-show-more-button"]' not found.
+All articles count: 386
+Unique articles count: 366
+End: [Expand And Get All Articles] Execution time - 2m:32s:536ms
+Start: [Parse Articles Data]
+End: [Parse Articles Data] Execution time - 0m:43s:611ms
+Start: [Export Articles to Excel File]
+Error while exporting articles data invalid literal for int() with base 10: '11m ago'
+End: [Export Articles to Excel File] Execution time - 0m:0s:46ms
+Start: [Download Pictures]
+No picture found for: Corrections: June 24, 2023
+No picture found for: Debris From Russian Missile Kills Three in Kyiv Apartment Building
+No picture found for: Understanding Ukraine’s Counteroffensive
+No picture found for: Corrections: June 22, 2023
+No picture found for: The Re-Militarization of Germany
+No picture found for: Quotation of the Day: Hidden Horrors of Russian Treatment of P.O.W.s
+No picture found for: Corrections: June 20, 2023
+No picture found for: Transcript: Ezra Klein Interviews Jon Favreau
+No picture found for: Quotation of the Day: Every Block Is Another Battle for ‘the Cyborgs’ in Ukraine’s East
+No picture found for: Despite Calls for Protests, Trump Arraignment Draws Only Colorful Crowds
+No picture found for: A U.S. Citizen Has Been Arrested in Russia, State Department Says
+No picture found for: Transcript: Ezra Klein Interviews Fareed Zakaria
+End: [Download Pictures] Execution time - 2m:56s:50ms
+End

@@ -1,0 +1,15 @@
+[
+  {
+    "payload": {
+      "search_phrase": "Ukraine",
+      "categories": [
+        "Article",
+        "Audio",
+        "Image Slideshow",
+        "Something"
+      ],
+      "number_of_month": 0
+    },
+    "files": {}
+  }
+]
