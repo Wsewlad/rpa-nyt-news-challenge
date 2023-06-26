@@ -27,6 +27,10 @@ Example:
   "number_of_month": 0
 }
 ```
+> ⚠️ Limitations of Robocorp Cloud Free Plan
+Please note that the Robocorp Cloud Free Plan has certain limitations that you need to consider when executing longer processes. One important limitation is the maximum allowed execution time for a single step, which is set to 180 seconds (3 minutes). If a step exceeds this time limit, it will result in a timeout error and the process will be terminated.
+
+> To ensure successful execution within the provided time constraints, it is crucial to carefully consider the input parameters and optimize the automation process accordingly.
 
 ## Execution
 
