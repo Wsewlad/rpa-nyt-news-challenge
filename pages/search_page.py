@@ -391,9 +391,7 @@ class SearchPage:
             try:
                 self.browser_lib.scroll_element_into_view(
                     show_more_button_selector)
-                # self.browser_lib.click_element(show_more_button_selector)
-                self.browser_lib.execute_javascript(
-                    """document.querySelector('[data-testid="search-show-more-button"]').click()""")
+                self.browser_lib.click_element(show_more_button_selector)
 
             except Exception as e:
                 print("No more Show Button -", str(e))
