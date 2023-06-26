@@ -12,16 +12,10 @@ from models.Article import Article
 class SearchPage:
 
     def __init__(self, browser_lib: Selenium):
-        # Define selectors
-        accept_cookies_selector = "//button[text()='Accept']"
-
         self.browser_lib = browser_lib
         title = self.browser_lib.get_title()
         assert title == "The New York Times - Search", "This is not Search Page, current page is - " + \
             self.browser_lib.get_location()
-        if self.browser_lib.is_element_visible(accept_cookies_selector):
-            print("Cookies popup found. Clossing...")
-            self.browser_lib.click_element(accept_cookies_selector)
 
     @exception_decorator("Set Date Range")
     @step_logger_decorator("Set Date Range")
