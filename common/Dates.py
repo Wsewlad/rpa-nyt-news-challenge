@@ -53,11 +53,17 @@ def get_time_tuple(current_time):
 
 def convert_string_to_date(date_string):
     current_date = datetime.datetime.now()
+    date = current_date
 
     if 'ago' in date_string:
-        # Handle "Xh ago" format
-        hours_ago = int(date_string.split('h')[0])
-        date = current_date - datetime.timedelta(hours=hours_ago)
+        if 'h' in date_string:
+            # Handle "Xh ago" format
+            hours_ago = int(date_string.split('h')[0])
+            date = current_date - datetime.timedelta(hours=hours_ago)
+        elif 'm' in date_string:
+            # Handle "Xm ago" format
+            minutes_ago = int(date_string.split('h')[0])
+            date = current_date - datetime.timedelta(minutes=minutes_ago)
     else:
         # Handle "Month day" format
         date = datetime.datetime.strptime(date_string, "%B %d").date()
