@@ -2,7 +2,6 @@
 import os
 # import custom modules
 import common.Helpers as helpers
-from common.Dates import convert_string_to_date
 
 
 class Article:
@@ -29,7 +28,7 @@ class Article:
         ```
         """
         row = {
-            'Date': convert_string_to_date(self.date).strftime("%Y-%m-%d %H:%M:%S"),
+            'Date': self.date,
             'Title': self.title,
             'Search Phrases Count': helpers.count_query_occurrences(self.search_phrase, self.title, self.description),
             'Description': self.description or 'No description found',

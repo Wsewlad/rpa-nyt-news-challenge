@@ -1,35 +1,48 @@
 Start: [Enter Search Query]
-End: [Enter Search Query] Execution time - 0m:9s:126ms
+End: [Enter Search Query] Execution time - 0m:6s:488ms
 Start: [Set Filters]
 Unknown filters:  ['Something']
-End: [Set Filters] Execution time - 0m:1s:497ms
-No section filters provided
+End: [Set Filters] Execution time - 0m:1s:346ms
+Start: [Set Filters]
+Unknown filters:  []
+End: [Set Filters] Execution time - 0m:0s:549ms
 Start: [Set Date Range]
-End: [Set Date Range] Execution time - 0m:3s:937ms
+End: [Set Date Range] Execution time - 0m:3s:582ms
 Start: [Sort By Newest]
-End: [Sort By Newest] Execution time - 0m:0s:318ms
+End: [Sort By Newest] Execution time - 0m:0s:356ms
 Start: [Expand And Get All Articles]
-No more Show Button - Element with locator 'css:[data-testid="search-show-more-button"]' not found.
-All articles count: 386
-Unique articles count: 366
-End: [Expand And Get All Articles] Execution time - 2m:32s:536ms
+No more Show Button - Message: javascript error: Cannot read properties of null (reading 'click')
+  (Session info: chrome=114.0.5735.133)
+Stacktrace:
+0   chromedriver                        0x000000010917a6b8 chromedriver + 4937400
+1   chromedriver                        0x0000000109171b73 chromedriver + 4901747
+2   chromedriver                        0x0000000108d2f616 chromedriver + 435734
+3   chromedriver                        0x0000000108d34adf chromedriver + 457439
+4   chromedriver                        0x0000000108d379bf chromedriver + 469439
+5   chromedriver                        0x0000000108db2bce chromedriver + 973774
+6   chromedriver                        0x0000000108d97012 chromedriver + 860178
+7   chromedriver                        0x0000000108db1e76 chromedriver + 970358
+8   chromedriver                        0x0000000108d96de3 chromedriver + 859619
+9   chromedriver                        0x0000000108d64d7f chromedriver + 654719
+10  chromedriver                        0x0000000108d660de chromedriver + 659678
+11  chromedriver                        0x00000001091362ad chromedriver + 4657837
+12  chromedriver                        0x000000010913b130 chromedriver + 4677936
+13  chromedriver                        0x0000000109141def chromedriver + 4705775
+14  chromedriver                        0x000000010913c05a chromedriver + 4681818
+15  chromedriver                        0x000000010910e92c chromedriver + 4495660
+16  chromedriver                        0x0000000109159838 chromedriver + 4802616
+17  chromedriver                        0x00000001091599b7 chromedriver + 4802999
+18  chromedriver                        0x000000010916a99f chromedriver + 4872607
+19  libsystem_pthread.dylib             0x00007ff801b831d3 _pthread_start + 125
+20  libsystem_pthread.dylib             0x00007ff801b7ebd3 thread_start + 15
+
+All articles count: 26
+Unique articles count: 26
+End: [Expand And Get All Articles] Execution time - 0m:2s:17ms
 Start: [Parse Articles Data]
-End: [Parse Articles Data] Execution time - 0m:43s:611ms
+End: [Parse Articles Data] Execution time - 0m:1s:842ms
 Start: [Export Articles to Excel File]
-Error while exporting articles data invalid literal for int() with base 10: '11m ago'
-End: [Export Articles to Excel File] Execution time - 0m:0s:46ms
+End: [Export Articles to Excel File] Execution time - 0m:0s:36ms
 Start: [Download Pictures]
-No picture found for: Corrections: June 24, 2023
-No picture found for: Debris From Russian Missile Kills Three in Kyiv Apartment Building
-No picture found for: Understanding Ukraine’s Counteroffensive
-No picture found for: Corrections: June 22, 2023
-No picture found for: The Re-Militarization of Germany
-No picture found for: Quotation of the Day: Hidden Horrors of Russian Treatment of P.O.W.s
-No picture found for: Corrections: June 20, 2023
-No picture found for: Transcript: Ezra Klein Interviews Jon Favreau
-No picture found for: Quotation of the Day: Every Block Is Another Battle for ‘the Cyborgs’ in Ukraine’s East
-No picture found for: Despite Calls for Protests, Trump Arraignment Draws Only Colorful Crowds
-No picture found for: A U.S. Citizen Has Been Arrested in Russia, State Department Says
-No picture found for: Transcript: Ezra Klein Interviews Fareed Zakaria
-End: [Download Pictures] Execution time - 2m:56s:50ms
+End: [Download Pictures] Execution time - 0m:19s:733ms
 End
