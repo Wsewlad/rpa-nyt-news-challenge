@@ -70,7 +70,6 @@ End: [Expand And Get All Articles] Execution time - 0m:24s:634ms
 Start: [Parse Articles Data]
 End: [Parse Articles Data] Execution time - 0m:16s:188ms
 Start: [Export Articles to Excel File]
-Error while exporting articles data invalid literal for int() with base 10: '13m ago'
 End: [Export Articles to Excel File] Execution time - 0m:0s:31ms
 Start: [Download Pictures]
 No picture found for: Corrections: June 24, 2023
