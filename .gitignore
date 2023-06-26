@@ -3,3 +3,4 @@
 *.xlsx
 *.log
 *.jpg
+/output
