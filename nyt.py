@@ -68,12 +68,6 @@ class NYT:
             # Wait for all tasks to complete
             concurrent.futures.wait(futures)
 
-    # Uncomment and run to compare with Async analog
-    # @step_logger_decorator("Download Pictures Sync")
-    # def download_pictures_sync(self, articles):
-    #     for article in articles:
-    #         article.download_picture()
-
     def execute(self):
         try:
             self.setup()
@@ -95,9 +89,6 @@ class NYT:
                 return
             export_articles_to_excel_file(articles)
             self.download_pictures(articles)
-
-            # Uncomment and run to compare with Async analog
-            # self.download_pictures_sync(articles)
 
         except Exception as e:
             print("An error occurred:", str(e))

@@ -8,12 +8,6 @@ from common.Decorators import step_logger_decorator
 
 @step_logger_decorator("Export Articles to Excel File")
 def export_articles_to_excel_file(articles):
-    """
-    Exports a list of articles to an Excel file.
-
-    Parameters:
-        `articles (list)`: A list of article objects.
-    """
     try:
         excel_lib = Files()
         excel_lib.create_workbook(

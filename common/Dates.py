@@ -2,22 +2,6 @@ import datetime
 
 
 def get_date_range(months):
-    """
-    Calculate the date range based on the number of past months.
-
-    Args:
-        `months (int)`: Number of past months to include in the date range.
-
-    Returns:
-        `tuple`: A tuple containing the start date and end date of the date range.
-
-    Example:
-    ```
-        start_date, end_date = get_date_range(3)
-        print(start_date)  # Output: 2023-03-01
-        print(end_date)  # Output: 2023-05-30
-    ```
-    """
     current_date = datetime.date.today()
     current_year = current_date.year
     current_month = current_date.month
@@ -37,14 +21,6 @@ def get_date_range(months):
 
 
 def get_time_tuple(current_time):
-    """
-    Takes a time value in seconds and returns a tuple containing the equivalent minutes, seconds, and milliseconds.
-
-    Args:
-        `current_time (float)`: The time value in seconds.
-    Returns:
-        `tuple`: A tuple containing the `minutes, seconds, and milliseconds` extracted from the current_time value.
-    """
     minutes = int(current_time // 60)
     seconds = int(current_time % 60)
     milliseconds = int((current_time % 1) * 1000)

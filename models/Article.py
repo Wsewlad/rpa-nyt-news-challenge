@@ -14,19 +14,6 @@ class Article:
         self.image_url = image_url
 
     def make_excel_row(self):
-        """
-        Creates a dictionary representing a row of data for an article to be written into an Excel file.
-
-        Returns:
-            `dict`: A dictionary representing the row of data for the article.
-
-        Usage:
-        ```
-            article = Article(date='2023-05-30', title='Sample Article', search_phrase='example search', description='This is an example article.', image_url='https://example.com/image.jpg')
-            row = article.make_excel_row()
-            # {'Date': '2023-05-30', 'Title': 'Sample Article', 'Search Phrases Count': 1, 'Description': 'This is an example article.', 'Contains Money': False, 'Picture Filename': 'image.jpg'}
-        ```
-        """
         row = {
             'Date': self.date,
             'Title': self.title,
@@ -38,16 +25,6 @@ class Article:
         return row
 
     def download_picture(self):
-        """
-        Downloads the picture associated with the article.
-
-        Usage:
-        ```
-            article = Article(date='2023-05-30', title='Sample Article', search_phrase='example search', description='This is an example article.', image_url='https://example.com/image.jpg')
-            article.download_picture()
-            # The picture from the URL 'https://example.com/image.jpg' is downloaded and saved to the 'output/images' directory.
-        ```
-        """
         if self.image_url:
             helpers.download_picture(
                 self.image_url, os.path.join('output', 'images')
