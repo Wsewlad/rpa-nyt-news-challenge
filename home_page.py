@@ -1,7 +1,6 @@
 from RPA.Browser.Selenium import Selenium
-from tenacity import retry
-from Decorators import exception_decorator, step_logger_decorator
 import constants as const
+from logger import logger
 
 
 class HomePage:
@@ -18,15 +17,14 @@ class HomePage:
         title = self.browser_lib.get_title()
 
         if self.browser_lib.is_element_visible(accept_cookies_selector):
-            print("Cookies popup found. Clossing...")
+            logger.info('Cookies popup found. Clossing...')
             self.browser_lib.click_element(accept_cookies_selector)
 
         assert title == "The New York Times - Breaking News, US News, World News and Videos", "This is not Home Page, current page is - " + \
             self.browser_lib.get_location()
 
-    @exception_decorator("Enter Search Query")
-    @step_logger_decorator("Enter Search Query")
     def enter_search_query(self, query):
+        logger.info('Enter search query')
         # Define selectors
         search_button = 'css:[data-test-id="search-button"]'
         search_input = 'css:[data-testid="search-input"]'

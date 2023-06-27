@@ -1,9 +1,9 @@
 from RPA.Browser.Selenium import Selenium
 from urllib.parse import urlparse, parse_qs, urlunparse
 import re
-import constants as Const
-from Decorators import exception_decorator, step_logger_decorator
-from Article import Article
+import constants as const
+from logger import logger
+from article import Article
 
 
 class SearchPage:
@@ -14,9 +14,8 @@ class SearchPage:
         assert title == "The New York Times - Search", "This is not Search Page, current page is - " + \
             self.browser_lib.get_location()
 
-    @exception_decorator("Set Date Range")
-    @step_logger_decorator("Set Date Range")
     def set_date_range(self, start_date, end_date):
+        logger.info('Set date range')
         # Define selectors
         search_date_dropdown_selector = 'css:[data-testid="search-date-dropdown-a"]'
         specific_dates_selector = 'css:[value="Specific Dates"]'
@@ -28,10 +27,10 @@ class SearchPage:
         self.browser_lib.click_element(specific_dates_selector)
 
         # Get date strings in appropriate format
-        start_date_input_string = start_date.strftime(Const.DATE_INPUT_FORMAT)
-        end_date_input_string = end_date.strftime(Const.DATE_INPUT_FORMAT)
-        start_date_query_string = start_date.strftime(Const.DATE_QUERY_FORMAT)
-        end_date_query_string = end_date.strftime(Const.DATE_QUERY_FORMAT)
+        start_date_input_string = start_date.strftime(const.DATE_INPUT_FORMAT)
+        end_date_input_string = end_date.strftime(const.DATE_INPUT_FORMAT)
+        start_date_query_string = start_date.strftime(const.DATE_QUERY_FORMAT)
+        end_date_query_string = end_date.strftime(const.DATE_QUERY_FORMAT)
 
         # Input dates
         self.browser_lib.input_text(
@@ -45,11 +44,16 @@ class SearchPage:
         self.__verify_date_entries(
             start_date_input_string, end_date_input_string, start_date_query_string, end_date_query_string)
 
-    @exception_decorator("Set Filters")
-    @step_logger_decorator("Set Filters")
     def set_filters(self, items, filter_type):
         if filter_type not in ['type', 'section']:
             raise Exception(f"Undefined filter type: {filter_type}")
+
+        filter = 'sections' if filter_type == 'section' else 'categories'
+        if len(items) == 0:
+            logger.info(f"No {filter} filter provided")
+
+        logger.info(
+            f"Set {filter}")
 
         # Define selectors
         form_selector = f'css:[role="form"][data-testid="{filter_type}"]'
@@ -103,15 +107,16 @@ class SearchPage:
                     checkbox_by_value[formatted_category])
             except:
                 not_found_items.append(category)
-        print("Unknown filters: ", not_found_items)
+
+        if len(not_found_items) > 0:
+            logger.warning(f"Unknown {filter}: {not_found_items}")
 
         # Verify selected items
         self.__verify_selected_items(
             not_found_items, formatted_items, filter_type)
 
-    @exception_decorator("Sort By Newest")
-    @step_logger_decorator("Sort By Newest")
     def sort_by_newest(self):
+        logger.info("Sort by newest")
         # Define selectors
         sort_by_selector = 'css:[data-testid="SearchForm-sortBy"]'
 
@@ -125,9 +130,8 @@ class SearchPage:
             sort_by_selector)
         assert sort_by_element_value == value_to_select
 
-    @exception_decorator("Expand And Get All Articles")
-    @step_logger_decorator("Expand And Get All Articles")
     def expand_and_get_all_articles(self):
+        logger.info("Expand all articles")
         # Define selectors
         show_more_button_selector = 'css:[data-testid="search-show-more-button"]'
         search_results_selector = 'css:[data-testid="search-results"]'
@@ -145,17 +149,16 @@ class SearchPage:
         search_result_items = self.browser_lib.find_elements(
             search_result_selector, search_result_list
         )
-        print("All articles count: " + str(len(search_result_items)))
+        logger.info("All articles count: " + str(len(search_result_items)))
 
         # Get unique elements
         unique_elements = self.__get_unique_elements(
             search_result_items, search_result_link_selector)
-        print("Unique articles count: " + str(len(unique_elements)))
+        logger.info("Unique articles count: " + str(len(unique_elements)))
         return unique_elements
 
-    @step_logger_decorator("Parse Articles Data")
-    @exception_decorator("Parse Articles Data")
     def parse_articles_data(self, articles, search_phrase):
+        logger.info("Parse articles data")
         data = []
         for article in articles:
             try:
@@ -163,13 +166,11 @@ class SearchPage:
                 article = self.parse_article_data(
                     article[0], search_phrase
                 )
-
                 data.append(article)
             except Exception as e:
                 print(f"Failed to parse article data: {article[1]}", e)
         return data
 
-    @exception_decorator("Parse Article Data")
     def parse_article_data(self, article_element, search_phrase):
         # Define selectors
         date_selector = 'css:[data-testid="todays-date"]'
@@ -190,7 +191,7 @@ class SearchPage:
             description = self.browser_lib.get_text(description_element)
         except:
             description = None
-            print(f'No description found for: {title}')
+            logger.warning(f'No description found for: {title}')
         try:
             image_element = self.browser_lib.find_element(
                 image_selector, article_element)
@@ -283,7 +284,7 @@ class SearchPage:
                 self.browser_lib.click_element(show_more_button_selector)
 
             except Exception as e:
-                print("No more Show Button -", str(e))
+                logger.info("No more Show Button")
                 break
 
         self.browser_lib.wait_until_element_is_enabled(

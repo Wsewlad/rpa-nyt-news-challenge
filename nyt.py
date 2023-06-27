@@ -1,12 +1,13 @@
 from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
+from RPA.Excel.Files import Files
 import concurrent.futures
-from excel import export_articles_to_excel_file
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from Decorators import step_logger_decorator
-from HomePage import HomePage
-from SearchPage import SearchPage
+from logger import logger
+import os
+from home_page import HomePage
+from search_page import SearchPage
 
 
 class NYT:
@@ -16,53 +17,57 @@ class NYT:
         self.search_page = None
 
     def setup(self):
-        # Init browser lib
+        logger.info('Setup')
         self.browser_lib = Selenium()
         self.browser_lib.auto_close = False
         self.browser_lib.set_selenium_implicit_wait(15)
 
     def get_work_item_variables(self):
+        logger.info('Get work item variables')
         library = WorkItems()
         library.get_input_work_item()
         return library.get_work_item_variables()
 
     def enter_search_query(self, search_phrase):
-        # Home page logic
         self.home_page = HomePage(self.browser_lib)
         self.home_page.lend_first_page()
         self.home_page.enter_search_query(search_phrase)
 
     def set_search_filters(self, categories, sections, start_date, end_date):
-        # Search page logic
         self.search_page = SearchPage(self.browser_lib)
-        # Set filters
-        if len(categories) > 0:
-            self.search_page.set_filters(categories, 'type')
-        else:
-            print("No category filters provided")
-        if len(sections) > 0:
-            self.search_page.set_filters(sections, 'section')
-        else:
-            print("No section filters provided")
+        self.search_page.set_filters(categories, 'type')
+        self.search_page.set_filters(sections, 'section')
         self.search_page.set_date_range(start_date, end_date)
         self.search_page.sort_by_newest()
 
     def parse_articles(self, search_phrase):
-        # Get all unique article elements
-        articleElements = self.search_page.expand_and_get_all_articles()
-        # Parse article's data
+        article_elements = self.search_page.expand_and_get_all_articles()
         articles = self.search_page.parse_articles_data(
-            articleElements, search_phrase
+            article_elements, search_phrase
         )
         return articles
 
-    @step_logger_decorator("Download Pictures")
+    def export_articles_to_excel_file(self, articles):
+        logger.info('Export articles to excel file')
+        try:
+            excel_lib = Files()
+            excel_lib.create_workbook(
+                path=os.path.join('output', 'articles.xlsx'), fmt="xlsx", sheet_name="NYT")
+            data = []
+            for article in articles:
+                row = article.make_excel_row()
+                data.append(row)
+        except Exception as e:
+            print("Error while exporting articles data", e)
+        finally:
+            excel_lib.append_rows_to_worksheet(data, header=True)
+            excel_lib.save_workbook()
+
     def download_pictures(self, articles):
+        logger.info('Download pictures')
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            # Submit download_image function for each article
             futures = [executor.submit(article.download_picture)
                        for article in articles]
-            # Wait for all tasks to complete
             concurrent.futures.wait(futures)
 
     def execute(self):
@@ -80,24 +85,22 @@ class NYT:
             end_date = datetime.now()
             start_date = end_date - relativedelta(months=number_of_month)
 
-            print(start_date, end_date)
-
             self.enter_search_query(search_phrase)
             self.set_search_filters(categories, sections, start_date, end_date)
             articles = self.parse_articles(search_phrase)
-            if len(articles) == 0:
-                print("No articles")
-                return
-            export_articles_to_excel_file(articles)
-            self.download_pictures(articles)
+            if len(articles) > 0:
+                self.export_articles_to_excel_file(articles)
+                self.download_pictures(articles)
+            else:
+                logger.warning("No articles")
+            logger.info("Complete")
 
         except Exception as e:
-            print("An error occurred:", str(e))
+            logger.error("An error occurred:", str(e))
             if self.browser_lib:
                 self.browser_lib.capture_page_screenshot(
                     filename='output/error.png')
         finally:
-            print("End")
             if self.browser_lib:
                 self.browser_lib.capture_page_screenshot(
                     filename='output/end.png')
