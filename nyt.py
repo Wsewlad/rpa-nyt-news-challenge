@@ -5,11 +5,11 @@ from RPA.Robocorp.WorkItems import WorkItems
 import concurrent.futures
 # import custom modules
 from excel import export_articles_to_excel_file
-from common.Dates import get_date_range
-from common.Decorators import step_logger_decorator
+from Dates import get_date_range
+from Decorators import step_logger_decorator
 # import pages
-from pages.home_page import HomePage
-from pages.search_page import SearchPage
+from HomePage import HomePage
+from SearchPage import SearchPage
 
 
 class NYT:

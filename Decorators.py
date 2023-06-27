@@ -1,6 +1,6 @@
 import time
 
-from common.Dates import get_time_tuple
+from Dates import get_time_tuple
 
 
 def exception_decorator(step_name=None):

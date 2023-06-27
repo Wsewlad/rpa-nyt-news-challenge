@@ -1,7 +1,7 @@
 # import system modules
 import os
 # import custom modules
-import common.Helpers as helpers
+import Helpers as helpers
 
 
 class Article:

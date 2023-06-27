@@ -5,8 +5,8 @@ from urllib.parse import urlparse, parse_qs, urlunparse
 import re
 # import custom modules
 import constants as Const
-from common.Decorators import exception_decorator, step_logger_decorator
-from models.Article import Article
+from Decorators import exception_decorator, step_logger_decorator
+from Article import Article
 
 
 class SearchPage:

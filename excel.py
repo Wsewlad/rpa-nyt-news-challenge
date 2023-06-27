@@ -3,7 +3,7 @@ from RPA.Excel.Files import Files
 # import system modules
 import os
 # import custom modules
-from common.Decorators import step_logger_decorator
+from Decorators import step_logger_decorator
 
 
 @step_logger_decorator("Export Articles to Excel File")

@@ -5,7 +5,7 @@ import re
 import os
 from urllib.parse import urlparse
 
-from common.Decorators import step_logger_decorator
+from Decorators import step_logger_decorator
 
 
 def contains_money(title, description) -> bool:
