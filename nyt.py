@@ -1,13 +1,9 @@
-# import RPA modules
 from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
-# import system modules
 import concurrent.futures
-# import custom modules
 from excel import export_articles_to_excel_file
 from Dates import get_date_range
 from Decorators import step_logger_decorator
-# import pages
 from HomePage import HomePage
 from SearchPage import SearchPage
 

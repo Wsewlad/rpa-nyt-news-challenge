@@ -1,9 +1,6 @@
-# import RPA modules
 from RPA.Browser.Selenium import Selenium
-# import system modules
 from urllib.parse import urlparse, parse_qs, urlunparse
 import re
-# import custom modules
 import constants as Const
 from Decorators import exception_decorator, step_logger_decorator
 from Article import Article

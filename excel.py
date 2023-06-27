@@ -1,8 +1,5 @@
-# import RPA modules
 from RPA.Excel.Files import Files
-# import system modules
 import os
-# import custom modules
 from Decorators import step_logger_decorator
 
 

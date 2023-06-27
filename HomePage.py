@@ -1,8 +1,6 @@
-# import RPA modules
 from RPA.Browser.Selenium import Selenium
 from tenacity import retry
 from Decorators import exception_decorator, step_logger_decorator
-# import custom modules
 import constants as const
 
 

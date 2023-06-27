@@ -1,6 +1,4 @@
-# import system modules
 import os
-# import custom modules
 import Helpers as helpers
 
 

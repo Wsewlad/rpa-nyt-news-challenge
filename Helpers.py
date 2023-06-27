@@ -1,6 +1,4 @@
-# importt RPA modules
 from RPA.HTTP import HTTP
-# import system modules
 import re
 import os
 from urllib.parse import urlparse
