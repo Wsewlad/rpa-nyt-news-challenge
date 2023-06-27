@@ -17,7 +17,7 @@ class HomePage:
         title = self.browser_lib.get_title()
 
         if self.browser_lib.is_element_visible(accept_cookies_selector):
-            logger.info('Cookies popup found. Clossing...')
+            logger.info('Cookies popup found. Closing...')
             self.browser_lib.click_element(accept_cookies_selector)
 
         assert title == "The New York Times - Breaking News, US News, World News and Videos", "This is not Home Page, current page is - " + \

@@ -1,13 +1,13 @@
-from RPA.Browser.Selenium import Selenium
-from RPA.Robocorp.WorkItems import WorkItems
-from RPA.Excel.Files import Files
 import concurrent.futures
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from logger import logger
 import os
+from RPA.Browser.Selenium import Selenium
+from RPA.Robocorp.WorkItems import WorkItems
+from RPA.Excel.Files import Files
 from home_page import HomePage
 from search_page import SearchPage
+from logger import logger
 
 
 class NYT:
@@ -49,19 +49,15 @@ class NYT:
 
     def export_articles_to_excel_file(self, articles):
         logger.info('Export articles to excel file')
-        try:
-            excel_lib = Files()
-            excel_lib.create_workbook(
-                path=os.path.join('output', 'articles.xlsx'), fmt="xlsx", sheet_name="NYT")
-            data = []
-            for article in articles:
-                row = article.make_excel_row()
-                data.append(row)
-        except Exception as e:
-            print("Error while exporting articles data", e)
-        finally:
-            excel_lib.append_rows_to_worksheet(data, header=True)
-            excel_lib.save_workbook()
+        excel_lib = Files()
+        excel_lib.create_workbook(
+            path=os.path.join('output', 'articles.xlsx'), fmt="xlsx", sheet_name="NYT")
+        data = []
+        for article in articles:
+            row = article.make_excel_row()
+            data.append(row)
+        excel_lib.append_rows_to_worksheet(data, header=True)
+        excel_lib.save_workbook()
 
     def download_pictures(self, articles):
         logger.info('Download pictures')
@@ -74,10 +70,7 @@ class NYT:
         try:
             self.setup()
             variables = self.get_work_item_variables()
-            try:
-                search_phrase = variables["search_phrase"]
-            except:
-                raise Exception("No search_phrase variable provided")
+            search_phrase = variables["search_phrase"]
             categories = variables.get("categories", [])
             sections = variables.get("sections", [])
             number_of_month = variables.get("number_of_month", 0)
@@ -96,12 +89,10 @@ class NYT:
             logger.info("Complete")
 
         except Exception as e:
-            logger.error("An error occurred:", str(e))
-            if self.browser_lib:
-                self.browser_lib.capture_page_screenshot(
-                    filename='output/error.png')
+            logger.exception(e, stack_info=True)
         finally:
             if self.browser_lib:
+                logger.info("Capture page screenshot")
                 self.browser_lib.capture_page_screenshot(
                     filename='output/end.png')
                 self.browser_lib.close_all_browsers()
