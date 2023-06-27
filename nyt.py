@@ -2,7 +2,8 @@ from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
 import concurrent.futures
 from excel import export_articles_to_excel_file
-from Dates import get_date_range
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from Decorators import step_logger_decorator
 from HomePage import HomePage
 from SearchPage import SearchPage
@@ -75,7 +76,11 @@ class NYT:
             categories = variables.get("categories", [])
             sections = variables.get("sections", [])
             number_of_month = variables.get("number_of_month", 0)
-            start_date, end_date = get_date_range(number_of_month)
+            number_of_month = number_of_month if number_of_month > 0 else 1
+            end_date = datetime.now()
+            start_date = end_date - relativedelta(months=number_of_month)
+
+            print(start_date, end_date)
 
             self.enter_search_query(search_phrase)
             self.set_search_filters(categories, sections, start_date, end_date)
