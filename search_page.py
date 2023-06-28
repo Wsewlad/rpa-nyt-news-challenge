@@ -113,44 +113,62 @@ class SearchPage:
 
     def sort_by_newest(self):
         logger.info("Sort by newest")
-        # Define selectors
+        # Define selectors.
         sort_by_selector = 'css:[data-testid="SearchForm-sortBy"]'
 
-        # Select
+        # Select.
         value_to_select = 'newest'
         self.browser_lib.select_from_list_by_value(
             sort_by_selector, value_to_select)
 
-        # Verify
+        # Verify.
         sort_by_element_value = self.browser_lib.get_selected_list_value(
             sort_by_selector)
         assert sort_by_element_value == value_to_select
 
     def expand_and_get_all_articles(self):
         logger.info("Expand all articles")
-        # Define selectors
+        # Define selectors.
         show_more_button_selector = 'css:[data-testid="search-show-more-button"]'
         search_results_selector = 'css:[data-testid="search-results"]'
         search_result_selector = 'css:[data-testid="search-bodega-result"]'
         search_result_link_selector = 'css:[data-testid="search-bodega-result"] a'
 
-        # Expand all elements
-        self.__expand_all_elements(
-            show_more_button_selector, search_results_selector
+        # Expand all elements.
+        while self.browser_lib.is_element_enabled(show_more_button_selector):
+            try:
+                self.browser_lib.scroll_element_into_view(
+                    show_more_button_selector)
+                self.browser_lib.click_element(show_more_button_selector)
+            except:
+                logger.info("No more Show Button")
+                break
+        self.browser_lib.wait_until_element_is_enabled(
+            search_results_selector, timeout=10
         )
 
-        # Get all elements
-        search_result_list = self.browser_lib.find_element(
-            search_results_selector)
+        # Get all elements.
         search_result_items = self.browser_lib.find_elements(
-            search_result_selector, search_result_list
+            search_result_selector
         )
-        logger.info("All articles count: " + str(len(search_result_items)))
+        logger.info(f"All articles count: {len(search_result_items)}")
 
-        # Get unique elements
-        unique_elements = self.__get_unique_elements(
-            search_result_items, search_result_link_selector)
-        logger.info("Unique articles count: " + str(len(unique_elements)))
+        # Get unique elements.
+        elements_by_url = dict([
+            (
+                self.__get_clean_url(
+                    self.browser_lib.get_element_attribute(
+                        self.browser_lib.find_element(
+                            search_result_link_selector, element),
+                        'href'
+                    )
+                ),
+                element
+            )
+            for element in search_result_items
+        ])
+        unique_elements = elements_by_url.values()
+        logger.info(f"Unique articles count: {len(unique_elements)}")
         return unique_elements
 
     def parse_articles_data(self, articles, search_phrase):
@@ -160,11 +178,11 @@ class SearchPage:
             try:
                 # Parse article data
                 article = self.parse_article_data(
-                    article[0], search_phrase
+                    article, search_phrase
                 )
                 data.append(article)
             except Exception as e:
-                print(f"Failed to parse article data: {article[1]}", e)
+                print(f"Failed to parse article data: {article}", e)
         return data
 
     def parse_article_data(self, article_element, search_phrase):
@@ -201,48 +219,5 @@ class SearchPage:
 
     # Helper Methods.
 
-    def __expand_all_elements(self, show_more_button_selector, search_results_selector):
-        # Expand all elements
-        while self.browser_lib.is_element_enabled(show_more_button_selector):
-            try:
-                self.browser_lib.scroll_element_into_view(
-                    show_more_button_selector)
-                self.browser_lib.click_element(show_more_button_selector)
-
-            except Exception as e:
-                logger.info("No more Show Button")
-                break
-
-        self.browser_lib.wait_until_element_is_enabled(
-            search_results_selector, timeout=10
-        )
-
-    def __get_unique_elements(self, search_result_items, search_result_link_selector):
-        # Make tuple with URLs
-        tuple_items = [
-            (
-                element,
-                self.__get_clean_url(
-                    self.browser_lib.get_element_attribute(
-                        self.browser_lib.find_element(
-                            search_result_link_selector, element),
-                        'href'
-                    )
-                )
-            )
-            for element in search_result_items
-        ]
-
-        # Filter by unique URL
-        first_item = tuple_items.pop(0)
-        unique_tuple_items = [first_item]
-        seen_urls = {first_item[1]}
-        for item in tuple_items:
-            if item[1] not in seen_urls:
-                unique_tuple_items.append(item)
-                seen_urls.add(item[1])
-        return unique_tuple_items
-
-    def __get_clean_url(self, url) -> str:
-        clean_url = urlunparse(list(urlparse(url)[:3]) + ['', '', ''])
-        return clean_url
+    def __get_clean_url(self, url_string) -> str:
+        return urlunparse(list(urlparse(url_string)[:3]) + ['', '', ''])
