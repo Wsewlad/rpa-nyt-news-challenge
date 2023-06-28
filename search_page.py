@@ -46,75 +46,70 @@ class SearchPage:
         assert start_date_string == parsed_start_date and end_date_string == parsed_end_date, "Date range from UI doesn't match"
 
     def set_filters(self, items, filter_type):
-        if filter_type not in ['type', 'section']:
-            raise Exception(f"Undefined filter type: {filter_type}")
-
+        # Arguments validation.
+        assert filter_type in [
+            'type', 'section'], f"Undefined filter type: {filter_type}"
         filter = 'sections' if filter_type == 'section' else 'categories'
         if len(items) == 0:
             logger.info(f"No {filter} filter provided")
+            return
+        if "any" in items:
+            logger.warning(f"{filter} contain `Any`. Skipping selection.")
+            return
 
         logger.info(
             f"Set {filter}")
 
-        # Define selectors
+        # Define selectors.
         form_selector = f'css:[role="form"][data-testid="{filter_type}"]'
         button_selector = 'css:button[data-testid="search-multiselect-button"]'
         dropdown_list_selector = 'css:[data-testid="multi-select-dropdown-list"]'
         checkbox_selector = 'css:input[type="checkbox"]'
+        selected_item_selector = f'css:div.query-facet-{filter_type}s button[facet-name="{filter_type}s"]'
 
-        # Open dropdown list
+        # Open dropdown list.
         type_form_element = self.browser_lib.find_element(form_selector)
         button_element = self.browser_lib.find_element(
             button_selector, type_form_element)
         self.browser_lib.click_element(button_element)
 
-        # Wait for dropdown list
+        # Find all checkbox elements and map it by value.
         dropdown_list_element = self.browser_lib.find_element(
             dropdown_list_selector, type_form_element)
-        self.browser_lib.wait_until_element_is_visible(dropdown_list_element)
-
-        # Find all checkbox elements and map it by value
         checkbox_elements = self.browser_lib.find_elements(
             checkbox_selector, dropdown_list_element)
         checkbox_by_value = dict([
             (
-                self.__format_item(
-                    self.browser_lib.get_element_attribute(
-                        checkbox, 'value'
-                    ).split('|nyt:', 1)[0]
-                ),
+                self.browser_lib.get_element_attribute(
+                    checkbox, 'value'
+                ).split('|nyt:', 1)[0].replace(" ", "").lower(),
                 checkbox
             )
             for checkbox in checkbox_elements
         ])
 
-        # If categories contains `Any` - skip selection
-        unique_items = set(items)
-        formatted_items = set(
-            [
-                self.__format_item(category)
-                for category in unique_items
-            ]
-        )
-        if "any" in formatted_items:
-            return
-
-        # Select items and save not_found_items
+        # Select items and save not_found_items.
         not_found_items = []
-        for category in unique_items:
+        for item in items:
             try:
-                formatted_category = self.__format_item(category)
                 self.browser_lib.click_element(
-                    checkbox_by_value[formatted_category])
+                    checkbox_by_value[item])
             except:
-                not_found_items.append(category)
-
+                not_found_items.append(item)
         if len(not_found_items) > 0:
             logger.warning(f"Unknown {filter}: {not_found_items}")
 
-        # Verify selected items
-        self.__verify_selected_items(
-            not_found_items, formatted_items, filter_type)
+        # Verify selected items.
+        selected_item_elements = self.browser_lib.find_elements(
+            selected_item_selector)
+        selected_items_labels = [
+            self.browser_lib.get_element_attribute(
+                category, 'value').split('|nyt:', 1)[0].replace(" ", "").lower()
+            for category in selected_item_elements
+        ]
+        expected_selected_items = set(items).difference(not_found_items)
+        assert len(expected_selected_items.difference(
+            selected_items_labels)) == 0, f"Selected {type} items don't match"
 
     def sort_by_newest(self):
         logger.info("Sort by newest")
@@ -204,38 +199,7 @@ class SearchPage:
 
         return Article(search_phrase, title, date, description, image_url)
 
-    # Helper Methods
-
-    def __format_item(self, item: str) -> str:
-        return item.replace(" ", "").lower()
-
-    def __verify_selected_items(self, not_found_items, formatted_items, type):
-        # Define selectors
-        selected_item_container_selector = f'css:div.query-facet-{type}s'
-        selected_item_selector = f'css:button[facet-name="{type}s"]'
-
-        # Find container
-        selected_items_container_element = self.browser_lib.find_element(
-            selected_item_container_selector)
-
-        # Find elements
-        selected_item_elements = self.browser_lib.find_elements(
-            selected_item_selector, selected_items_container_element)
-
-        # Get element values
-        selected_items_labels = [
-            self.__format_item(self.browser_lib.get_element_attribute(
-                category, 'value').split('|nyt:', 1)[0])
-            for category in selected_item_elements
-        ]
-        not_found_items_formatted = [
-            self.__format_item(item) for item in not_found_items]
-        expected_selected_items = [
-            item for item in formatted_items if item not in not_found_items_formatted]
-
-        # Verify
-        assert len(set(expected_selected_items).intersection(selected_items_labels)) == len(
-            expected_selected_items), f"Selected {type} items don't match"
+    # Helper Methods.
 
     def __expand_all_elements(self, show_more_button_selector, search_results_selector):
         # Expand all elements

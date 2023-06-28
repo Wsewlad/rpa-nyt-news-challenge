@@ -71,8 +71,10 @@ class NYT:
             self.setup()
             variables = self.get_work_item_variables()
             search_phrase = variables["search_phrase"]
-            categories = variables.get("categories", [])
-            sections = variables.get("sections", [])
+            categories = [var.replace(" ", "").lower()
+                          for var in set(variables.get("categories", []))]
+            sections = [var.replace(" ", "").lower()
+                        for var in set(variables.get("sections", []))]
             number_of_month = variables.get("number_of_month", 0)
             number_of_month = number_of_month if number_of_month > 0 else 1
             end_date = datetime.now()
