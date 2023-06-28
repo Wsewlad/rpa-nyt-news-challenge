@@ -16,19 +16,23 @@ class SearchPage:
 
     def set_date_range(self, start_date, end_date):
         logger.info('Set date range')
-        # Define selectors
+
+        # Define selectors.
         search_date_dropdown_selector = 'css:[data-testid="search-date-dropdown-a"]'
         specific_dates_selector = 'css:[value="Specific Dates"]'
         start_date_selector = 'css:[data-testid="DateRange-startDate"]'
         end_date_selector = 'css:[data-testid="DateRange-endDate"]'
         date_range_selector = 'css:div.query-facet-date button[facet-name="date"]'
-        # Navigate to date range picker
+
+        # Navigate to date range picker.
         self.browser_lib.click_element(search_date_dropdown_selector)
         self.browser_lib.click_element(specific_dates_selector)
-        # Get date strings in appropriate format
+
+        # Get date strings in appropriate format.
         start_date_string = start_date.strftime(const.DATE_INPUT_FORMAT)
         end_date_string = end_date.strftime(const.DATE_INPUT_FORMAT)
-        # Set dates
+
+        # Set dates.
         self.browser_lib.input_text(
             start_date_selector, start_date_string
         )
@@ -36,7 +40,8 @@ class SearchPage:
             end_date_selector, end_date_string)
         self.browser_lib.press_keys(end_date_selector, "ENTER")
         self.browser_lib.reload_page()
-        # Validate
+
+        # Validate.
         date_range_value = self.browser_lib.get_element_attribute(
             date_range_selector, 'value')
         parsed_start_date = re.search(
@@ -113,6 +118,7 @@ class SearchPage:
 
     def sort_by_newest(self):
         logger.info("Sort by newest")
+
         # Define selectors.
         sort_by_selector = 'css:[data-testid="SearchForm-sortBy"]'
 
@@ -128,6 +134,7 @@ class SearchPage:
 
     def expand_and_get_all_articles(self):
         logger.info("Expand all articles")
+
         # Define selectors.
         show_more_button_selector = 'css:[data-testid="search-show-more-button"]'
         search_results_selector = 'css:[data-testid="search-results"]'
@@ -171,51 +178,17 @@ class SearchPage:
         logger.info(f"Unique articles count: {len(unique_elements)}")
         return unique_elements
 
-    def parse_articles_data(self, articles, search_phrase):
+    def parse_articles_data(self, article_elements, search_phrase):
         logger.info("Parse articles data")
         data = []
-        for article in articles:
+        for element in article_elements:
             try:
-                # Parse article data
-                article = self.parse_article_data(
-                    article, search_phrase
-                )
+                article = Article(self.browser_lib, element, search_phrase)
                 data.append(article)
             except Exception as e:
-                print(f"Failed to parse article data: {article}", e)
+                logger.warning(
+                    f"Failed to parse article's data: {e}")
         return data
-
-    def parse_article_data(self, article_element, search_phrase):
-        # Define selectors
-        date_selector = 'css:[data-testid="todays-date"]'
-        title_selector = 'css:a > h4'
-        description_selector = 'css:a p:nth-child(2)'
-        image_selector = 'css:img'
-
-        # Get data
-        date_element = self.browser_lib.find_element(
-            date_selector, article_element)
-        date = self.browser_lib.get_text(date_element)
-        title_element = self.browser_lib.find_element(
-            title_selector, article_element)
-        title = self.browser_lib.get_text(title_element)
-        try:
-            description_element = self.browser_lib.find_element(
-                description_selector, article_element)
-            description = self.browser_lib.get_text(description_element)
-        except:
-            description = None
-            logger.warning(f'No description found for: {title}')
-        try:
-            image_element = self.browser_lib.find_element(
-                image_selector, article_element)
-            image_url = self.__get_clean_url(
-                self.browser_lib.get_element_attribute(image_element, 'src')
-            )
-        except:
-            image_url = None
-
-        return Article(search_phrase, title, date, description, image_url)
 
     # Helper Methods.
 

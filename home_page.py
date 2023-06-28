@@ -9,7 +9,7 @@ class HomePage:
         self.browser_lib = browser_lib
 
     def lend_first_page(self):
-        # Define selectors
+        # Define selectors.
         accept_cookies_selector = "//button[text()='Accept']"
 
         self.browser_lib.open_available_browser(const.BASE_URL)
@@ -25,20 +25,20 @@ class HomePage:
 
     def enter_search_query(self, query):
         logger.info('Enter search query')
-        # Define selectors
+        # Define selectors.
         search_button = 'css:[data-test-id="search-button"]'
         search_input = 'css:[data-testid="search-input"]'
         search_submit = 'css:[data-test-id="search-submit"]'
         search_text_field = 'searchTextField'
 
-        # Type search query
+        # Type search query.
         self.browser_lib.click_element(search_button)
         self.browser_lib.input_text_when_element_is_visible(
             search_input, query
         )
         self.browser_lib.click_element(search_submit)
 
-        # Validate applied search query on the search page
+        # Validate applied search query on the search page.
         self.browser_lib.wait_until_page_contains_element(search_text_field)
         search_text_field_value = self.browser_lib.get_element_attribute(
             search_text_field, 'value'
@@ -46,5 +46,4 @@ class HomePage:
         search_text_field_matched = self.browser_lib.is_element_attribute_equal_to(
             search_text_field, 'value', query
         )
-
         assert search_text_field_matched, f"Search text field value [{search_text_field_value}] doesn't match the query [{query}]"

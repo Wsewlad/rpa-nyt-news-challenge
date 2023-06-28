@@ -14,6 +14,37 @@ class Article:
         self.description = description
         self.image_url = image_url
 
+    def __init__(self, browser_lib, article_element, search_phrase):
+        # Define selectors.
+        date_selector = 'css:[data-testid="todays-date"]'
+        title_selector = 'css:a > h4'
+        description_selector = 'css:a p:nth-child(2)'
+        image_selector = 'css:img'
+
+        # Get data.
+        self.search_phrase = search_phrase
+        date_element = browser_lib.find_element(
+            date_selector, article_element)
+        self.date = browser_lib.get_text(date_element)
+        title_element = browser_lib.find_element(
+            title_selector, article_element)
+        self.title = browser_lib.get_text(title_element)
+        try:
+            description_element = browser_lib.find_element(
+                description_selector, article_element)
+            self.description = browser_lib.get_text(description_element)
+        except:
+            self.description = None
+            logger.warning(f'No description found for: {self.title}')
+        try:
+            image_element = browser_lib.find_element(
+                image_selector, article_element)
+            self.image_url = browser_lib.get_element_attribute(
+                image_element, 'src')
+        except:
+            logger.warning(f'No image found for: {self.title}')
+            self.image_url = None
+
     def make_excel_row(self):
         row = {
             'Date': self.date,
