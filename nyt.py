@@ -1,5 +1,5 @@
 import concurrent.futures
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import os
 from RPA.Browser.Selenium import Selenium
@@ -20,9 +20,10 @@ class NYT:
         logger.info('Setup')
         self.browser_lib = Selenium()
         self.browser_lib.auto_close = False
-        self.browser_lib.set_selenium_implicit_wait(15)
+        self.browser_lib.set_selenium_implicit_wait(timedelta(seconds=15))
 
-    def get_work_item_variables(self):
+    @staticmethod
+    def get_work_item_variables():
         logger.info('Get work item variables')
         library = WorkItems()
         library.get_input_work_item()
@@ -47,7 +48,8 @@ class NYT:
         )
         return articles
 
-    def export_articles_to_excel_file(self, articles):
+    @staticmethod
+    def export_articles_to_excel_file(articles):
         logger.info('Export articles to excel file')
         excel_lib = Files()
         excel_lib.create_workbook(
@@ -59,7 +61,8 @@ class NYT:
         excel_lib.append_rows_to_worksheet(data, header=True)
         excel_lib.save_workbook()
 
-    def download_pictures(self, articles):
+    @staticmethod
+    def download_pictures(articles):
         logger.info('Download pictures')
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             futures = [executor.submit(article.download_picture)

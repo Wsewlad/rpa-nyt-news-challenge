@@ -20,8 +20,8 @@ class HomePage:
             logger.info('Cookies popup found. Closing...')
             self.browser_lib.click_element(accept_cookies_selector)
 
-        assert title == "The New York Times - Breaking News, US News, World News and Videos", "This is not Home Page, current page is - " + \
-            self.browser_lib.get_location()
+        assert title == "The New York Times - Breaking News, US News, World News and Videos",\
+            "This is not Home Page, current page is - " + self.browser_lib.get_location()
 
     def enter_search_query(self, query):
         logger.info('Enter search query')
@@ -46,4 +46,5 @@ class HomePage:
         search_text_field_matched = self.browser_lib.is_element_attribute_equal_to(
             search_text_field, 'value', query
         )
-        assert search_text_field_matched, f"Search text field value [{search_text_field_value}] doesn't match the query [{query}]"
+        assert search_text_field_matched,\
+            f"Search text field value [{search_text_field_value}] doesn't match the query [{query}]"

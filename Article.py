@@ -7,13 +7,6 @@ from logger import logger
 
 class Article:
 
-    def __init__(self, search_phrase, title, date, description, image_url):
-        self.search_phrase = search_phrase
-        self.title = title
-        self.date = date
-        self.description = description
-        self.image_url = image_url
-
     def __init__(self, browser_lib, article_element, search_phrase):
         # Define selectors.
         date_selector = 'css:[data-testid="todays-date"]'
@@ -33,16 +26,16 @@ class Article:
             description_element = browser_lib.find_element(
                 description_selector, article_element)
             self.description = browser_lib.get_text(description_element)
-        except:
+        except Exception as e:
             self.description = None
-            logger.warning(f'No description found for: {self.title}')
+            logger.warning(f'No description found for: {self.title} - {e}')
         try:
             image_element = browser_lib.find_element(
                 image_selector, article_element)
             self.image_url = browser_lib.get_element_attribute(
                 image_element, 'src')
-        except:
-            logger.warning(f'No image found for: {self.title}')
+        except Exception as e:
+            logger.warning(f'No image found for: {self.title} - {e}')
             self.image_url = None
 
     def make_excel_row(self):

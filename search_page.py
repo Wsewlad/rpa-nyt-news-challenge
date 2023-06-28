@@ -1,5 +1,5 @@
 from RPA.Browser.Selenium import Selenium
-from urllib.parse import urlparse, parse_qs, urlunparse
+from urllib.parse import urlparse, urlunparse
 import re
 import constants as const
 from logger import logger
@@ -45,25 +45,26 @@ class SearchPage:
         date_range_value = self.browser_lib.get_element_attribute(
             date_range_selector, 'value')
         parsed_start_date = re.search(
-            "^\d{2}/\d{2}/\d{4}", date_range_value).group()
+            r"^\d{2}/\d{2}/\d{4}", date_range_value).group()
         parsed_end_date = re.search(
-            "\d{2}/\d{2}/\d{4}$", date_range_value).group()
-        assert start_date_string == parsed_start_date and end_date_string == parsed_end_date, "Date range from UI doesn't match"
+            r"\d{2}/\d{2}/\d{4}$", date_range_value).group()
+        assert start_date_string == parsed_start_date and end_date_string == parsed_end_date,\
+            "Date range from UI doesn't match"
 
     def set_filters(self, items, filter_type):
         # Arguments validation.
         assert filter_type in [
             'type', 'section'], f"Undefined filter type: {filter_type}"
-        filter = 'sections' if filter_type == 'section' else 'categories'
+        filter_name = 'sections' if filter_type == 'section' else 'categories'
         if len(items) == 0:
-            logger.info(f"No {filter} filter provided")
+            logger.info(f"No {filter_name} filter provided")
             return
         if "any" in items:
-            logger.warning(f"{filter} contain `Any`. Skipping selection.")
+            logger.warning(f"{filter_name} contain `Any`. Skipping selection.")
             return
 
         logger.info(
-            f"Set {filter}")
+            f"Set {filter_name}")
 
         # Define selectors.
         form_selector = f'css:[role="form"][data-testid="{filter_type}"]'
@@ -93,16 +94,15 @@ class SearchPage:
             for checkbox in checkbox_elements
         ])
 
-        # Select items and save not_found_items.
+        # Select items.
         not_found_items = []
         for item in items:
             try:
                 self.browser_lib.click_element(
                     checkbox_by_value[item])
-            except:
+            except Exception as e:
+                logger.warning(f"Unknown {filter_name}: {e}")
                 not_found_items.append(item)
-        if len(not_found_items) > 0:
-            logger.warning(f"Unknown {filter}: {not_found_items}")
 
         # Verify selected items.
         selected_item_elements = self.browser_lib.find_elements(
@@ -147,8 +147,8 @@ class SearchPage:
                 self.browser_lib.scroll_element_into_view(
                     show_more_button_selector)
                 self.browser_lib.click_element(show_more_button_selector)
-            except:
-                logger.info("No more Show Button")
+            except Exception as e:
+                logger.info(f"No more Show Button - {e}")
                 break
         self.browser_lib.wait_until_element_is_enabled(
             search_results_selector, timeout=10
@@ -192,5 +192,6 @@ class SearchPage:
 
     # Helper Methods.
 
-    def __get_clean_url(self, url_string) -> str:
+    @staticmethod
+    def __get_clean_url(url_string) -> str:
         return urlunparse(list(urlparse(url_string)[:3]) + ['', '', ''])
