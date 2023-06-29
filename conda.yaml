@@ -16,3 +16,4 @@ dependencies:
       # https://pypi.org/
       - rpaframework==23.3.0 # https://rpaframework.org/releasenotes.html
       - screeninfo==0.8.1
+      - python-dateutil==2.8.2

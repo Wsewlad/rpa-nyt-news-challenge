@@ -56,39 +56,23 @@ The logs include the following:
 
 Example:
 ```
-Start: [Enter Search Query]
-End: [Enter Search Query] Execution time - 0m:15s:375ms
-Start: [Set Filters]
-Unknown filters:  ['Something']
-End: [Set Filters] Execution time - 0m:2s:83ms
-No section filters provided
-Start: [Set Date Range]
-End: [Set Date Range] Execution time - 0m:4s:212ms
-Start: [Sort By Newest]
-End: [Sort By Newest] Execution time - 0m:0s:354ms
-Start: [Expand And Get All Articles]
-No more Show Button - Element with locator 'css:[data-testid="search-show-more-button"]' not found.
-All articles count: 310
-Unique articles count: 230
-End: [Expand And Get All Articles] Execution time - 0m:24s:634ms
-Start: [Parse Articles Data]
-End: [Parse Articles Data] Execution time - 0m:16s:188ms
-Start: [Export Articles to Excel File]
-End: [Export Articles to Excel File] Execution time - 0m:0s:31ms
-Start: [Download Pictures]
-No picture found for: Corrections: June 24, 2023
-No picture found for: Debris From Russian Missile Kills Three in Kyiv Apartment Building
-No picture found for: Understanding Ukraine’s Counteroffensive
-No picture found for: Corrections: June 22, 2023
-No picture found for: The Re-Militarization of Germany
-No picture found for: Quotation of the Day: Hidden Horrors of Russian Treatment of P.O.W.s
-No picture found for: Corrections: June 20, 2023
-No picture found for: Transcript: Ezra Klein Interviews Jon Favreau
-No picture found for: Quotation of the Day: Every Block Is Another Battle for ‘the Cyborgs’ in Ukraine’s East
-No picture found for: Despite Calls for Protests, Trump Arraignment Draws Only Colorful Crowds
-No picture found for: A U.S. Citizen Has Been Arrested in Russia, State Department Says
-End: [Download Pictures] Execution time - 2m:9s:77ms
-End
+INFO    [nyt.py:20] - Setup
+INFO    [nyt.py:26] - Get work item variables
+INFO    [home_page.py:27] - Enter search query
+INFO    [search_page.py:65] - Set categories
+WARNING [search_page.py:105] - Unknown categories: ['something']
+INFO    [search_page.py:65] - Set sections
+INFO    [search_page.py:18] - Set date range
+INFO    [search_page.py:120] - Sort by newest
+INFO    [search_page.py:136] - Expand all articles
+INFO    [search_page.py:151] - No more Show Button
+INFO    [search_page.py:161] - All articles count: 34
+INFO    [search_page.py:178] - Unique articles count: 34
+INFO    [search_page.py:182] - Parse articles data
+INFO    [nyt.py:51] - Export articles to excel file
+INFO    [nyt.py:63] - Download pictures
+INFO    [nyt.py:91] - Complete
+INFO    [nyt.py:97] - Capture page screenshot
 ```
 
 ## Output

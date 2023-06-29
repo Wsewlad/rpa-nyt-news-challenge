@@ -1,15 +1,13 @@
-# import RPA modules
+import concurrent.futures
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import os
 from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
-# import system modules
-import concurrent.futures
-# import custom modules
-from excel import export_articles_to_excel_file
-from common.Dates import get_date_range
-from common.Decorators import step_logger_decorator
-# import pages
-from pages.home_page import HomePage
-from pages.search_page import SearchPage
+from RPA.Excel.Files import Files
+from home_page import HomePage
+from search_page import SearchPage
+from logger import logger
 
 
 class NYT:
@@ -19,94 +17,89 @@ class NYT:
         self.search_page = None
 
     def setup(self):
-        # Init browser lib
+        logger.info('Setup')
         self.browser_lib = Selenium()
         self.browser_lib.auto_close = False
-        self.browser_lib.set_selenium_implicit_wait(15)
+        self.browser_lib.set_selenium_implicit_wait(timedelta(seconds=15))
 
-    def get_work_item_variables(self):
+    @staticmethod
+    def get_work_item_variables():
+        logger.info('Get work item variables')
         library = WorkItems()
         library.get_input_work_item()
         return library.get_work_item_variables()
 
     def enter_search_query(self, search_phrase):
-        # Home page logic
         self.home_page = HomePage(self.browser_lib)
         self.home_page.lend_first_page()
         self.home_page.enter_search_query(search_phrase)
 
     def set_search_filters(self, categories, sections, start_date, end_date):
-        # Search page logic
         self.search_page = SearchPage(self.browser_lib)
-        # Set filters
-        if len(categories) > 0:
-            self.search_page.set_filters(categories, 'type')
-        else:
-            print("No category filters provided")
-        if len(sections) > 0:
-            self.search_page.set_filters(sections, 'section')
-        else:
-            print("No section filters provided")
+        self.search_page.set_filters(categories, 'type')
+        self.search_page.set_filters(sections, 'section')
         self.search_page.set_date_range(start_date, end_date)
         self.search_page.sort_by_newest()
 
     def parse_articles(self, search_phrase):
-        # Get all unique article elements
-        articleElements = self.search_page.expand_and_get_all_articles()
-        # Parse article's data
+        article_elements = self.search_page.expand_and_get_all_articles()
         articles = self.search_page.parse_articles_data(
-            articleElements, search_phrase
+            article_elements, search_phrase
         )
         return articles
 
-    @step_logger_decorator("Download Pictures")
-    def download_pictures(self, articles):
+    @staticmethod
+    def export_articles_to_excel_file(articles):
+        logger.info('Export articles to excel file')
+        excel_lib = Files()
+        excel_lib.create_workbook(
+            path=os.path.join('output', 'articles.xlsx'), fmt="xlsx", sheet_name="NYT")
+        data = []
+        for article in articles:
+            row = article.make_excel_row()
+            data.append(row)
+        excel_lib.append_rows_to_worksheet(data, header=True)
+        excel_lib.save_workbook()
+
+    @staticmethod
+    def download_pictures(articles):
+        logger.info('Download pictures')
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            # Submit download_image function for each article
             futures = [executor.submit(article.download_picture)
                        for article in articles]
-            # Wait for all tasks to complete
             concurrent.futures.wait(futures)
 
-    # Uncomment and run to compare with Async analog
-    # @step_logger_decorator("Download Pictures Sync")
-    # def download_pictures_sync(self, articles):
-    #     for article in articles:
-    #         article.download_picture()
+    @staticmethod
+    def prepare(text):
+        return text.replace(" ", "").lower()
 
     def execute(self):
         try:
             self.setup()
             variables = self.get_work_item_variables()
-            try:
-                search_phrase = variables["search_phrase"]
-            except:
-                raise Exception("No search_phrase variable provided")
-            categories = variables.get("categories", [])
-            sections = variables.get("sections", [])
+            search_phrase = variables["search_phrase"]
+            categories = {self.prepare(var) for var in variables.get("categories", [])}
+            sections = {self.prepare(var) for var in variables.get("sections", [])}
             number_of_month = variables.get("number_of_month", 0)
-            start_date, end_date = get_date_range(number_of_month)
+            number_of_month = number_of_month if number_of_month > 0 else 1
+            end_date = datetime.now()
+            start_date = end_date - relativedelta(months=number_of_month)
 
             self.enter_search_query(search_phrase)
             self.set_search_filters(categories, sections, start_date, end_date)
             articles = self.parse_articles(search_phrase)
-            if len(articles) == 0:
-                print("No articles")
-                return
-            export_articles_to_excel_file(articles)
-            self.download_pictures(articles)
-
-            # Uncomment and run to compare with Async analog
-            # self.download_pictures_sync(articles)
+            if len(articles) > 0:
+                self.export_articles_to_excel_file(articles)
+                self.download_pictures(articles)
+            else:
+                logger.warning("No articles")
+            logger.info("Complete")
 
         except Exception as e:
-            print("An error occurred:", str(e))
-            if self.browser_lib:
-                self.browser_lib.capture_page_screenshot(
-                    filename='output/error.png')
+            logger.exception(e, stack_info=True)
         finally:
-            print("End")
             if self.browser_lib:
+                logger.info("Capture page screenshot")
                 self.browser_lib.capture_page_screenshot(
                     filename='output/end.png')
                 self.browser_lib.close_all_browsers()
