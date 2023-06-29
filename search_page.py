@@ -10,9 +10,6 @@ class SearchPage:
 
     def __init__(self, browser_lib: Selenium):
         self.browser_lib = browser_lib
-        title = self.browser_lib.get_title()
-        assert title == "The New York Times - Search", "This is not Search Page, current page is - " + \
-            self.browser_lib.get_location()
 
     def set_date_range(self, start_date, end_date):
         logger.info('Set date range')
@@ -84,15 +81,13 @@ class SearchPage:
             dropdown_list_selector, type_form_element)
         checkbox_elements = self.browser_lib.find_elements(
             checkbox_selector, dropdown_list_element)
-        checkbox_by_value = dict([
-            (
-                self.browser_lib.get_element_attribute(
-                    checkbox, 'value'
-                ).split('|nyt:', 1)[0].replace(" ", "").lower(),
-                checkbox
-            )
-            for checkbox in checkbox_elements
-        ])
+        checkbox_by_value = {}
+        for checkbox in checkbox_elements:
+            checkbox_value = self.browser_lib.get_element_attribute(
+                checkbox, 'value')
+            formatted_value = checkbox_value.split(
+                '|nyt:', 1)[0].replace(" ", "").lower()
+            checkbox_by_value[formatted_value] = checkbox
 
         # Select items.
         not_found_items = []
@@ -107,12 +102,14 @@ class SearchPage:
         # Verify selected items.
         selected_item_elements = self.browser_lib.find_elements(
             selected_item_selector)
-        selected_items_labels = [
-            self.browser_lib.get_element_attribute(
-                category, 'value').split('|nyt:', 1)[0].replace(" ", "").lower()
-            for category in selected_item_elements
-        ]
-        expected_selected_items = set(items).difference(not_found_items)
+        selected_items_labels = set()
+        for element in selected_item_elements:
+            value = self.browser_lib.get_element_attribute(element, 'value')
+            formatted_value = value.split(
+                '|nyt:', 1)[0].replace(" ", "").lower()
+            selected_items_labels.add(formatted_value)
+
+        expected_selected_items = items.difference(not_found_items)
         assert len(expected_selected_items.difference(
             selected_items_labels)) == 0, f"Selected {type} items don't match"
 
@@ -160,20 +157,16 @@ class SearchPage:
         )
         logger.info(f"All articles count: {len(search_result_items)}")
 
-        # Get unique elements.
-        elements_by_url = dict([
-            (
-                self.__get_clean_url(
-                    self.browser_lib.get_element_attribute(
-                        self.browser_lib.find_element(
-                            search_result_link_selector, element),
-                        'href'
-                    )
-                ),
-                element
-            )
-            for element in search_result_items
-        ])
+        # Get unique elements using articles url as a dictionary key.
+        elements_by_url = dict()
+        for element in search_result_items:
+            link_element = self.browser_lib.find_element(
+                search_result_link_selector, element)
+            link_url = self.browser_lib.get_element_attribute(
+                link_element, 'href')
+            url_without_parameters = self.__get_clean_url(link_url)
+            elements_by_url[url_without_parameters] = element
+
         unique_elements = elements_by_url.values()
         logger.info(f"Unique articles count: {len(unique_elements)}")
         return unique_elements
